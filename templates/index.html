@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121;
+            color: #fff;
+        }
+
+        .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .section {
+            background-color: #000;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            flex: 1;
+            text-align: center;
+            margin-right: 20px;
+        }
+
+        .search {
+            width: 100%;
+            padding: 10px;
+            margin: 1px 0;
+            box-sizing: border-box;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        input[type="text"], input[type="number"] {
+            width: calc(100% - 20px);
+            padding: 5px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        input[type="number"] {
+            width: 50px;
+        }
+
+        .item-list, .bill-list {
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        tr:hover {
+            background-color: #333;
+        }
+
+        .total {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #152c3d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .add-to-cart {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shopping Cart</h1>
+    <div class="container">
+        <div class="section">
+            <h2>Items</h2>
+            <input type="text" id="search" class="search" placeholder="Search for items...">
+            <div class="item-list">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="item-list"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="section">
+            <h2>Cart</h2>
+            <ul id="cart" class="bill-list"></ul>
+            <div class="total">
+                <strong>Total: $<span id="total">0.00</span></strong>
+            </div>
+            <button onclick="checkout()">Checkout</button>
+        </div>
+    </div>
+
+    <script>
+        const items = [
+            { name: 'Apple', price: 1.00 },
+            { name: 'Banana', price: 0.50 },
+            { name: 'Cherry', price: 0.25 },
+            { name: 'Date', price: 0.75 },
+            { name: 'Elderberry', price: 1.50 },
+            { name: 'Fig', price: 0.80 },
+            { name: 'Grape', price: 2.00 },
+            { name: 'Honeydew', price: 3.00 },
+            { name: 'Indian Fig', price: 1.75 },
+            { name: 'Jackfruit', price: 1.20 },
+            { name: 'Kiwi', price: 0.60 },
+            { name: 'Lemon', price: 0.40 },
+            { name: 'Mango', price: 1.30 },
+            { name: 'Nectarine', price: 1.10 },
+            { name: 'Orange', price: 0.70 },
+            { name: 'Papaya', price: 1.80 },
+            { name: 'Quince', price: 1.90 },
+            { name: 'Raspberry', price: 2.50 },
+            { name: 'Strawberry', price: 1.60 },
+            { name: 'Tangerine', price: 0.90 },
+            { name: 'Ugli Fruit', price: 2.10 },
+            { name: 'Vanilla Bean', price: 3.50 },
+            { name: 'Watermelon', price: 4.00 },
+            { name: 'Xigua (Chinese watermelon)', price: 3.00 },
+            { name: 'Yellow Passion Fruit', price: 2.20 },
+            { name: 'Zucchini', price: 1.00 },
+            { name: 'Asparagus', price: 2.30 },
+            { name: 'Broccoli', price: 1.20 },
+            { name: 'Carrot', price: 0.80 },
+            { name: 'Daikon', price: 1.10 },
+            { name: 'Eggplant', price: 1.50 },
+            { name: 'Fennel', price: 2.40 },
+            { name: 'Garlic', price: 0.60 },
+            { name: 'Horseradish', price: 2.00 },
+            { name: 'Iceberg Lettuce', price: 1.00 },
+            { name: 'Jalapeno', price: 0.90 },
+            { name: 'Kale', price: 1.80 },
+            { name: 'Leek', price: 1.30 },
+            { name: 'Mushroom', price: 2.00 },
+            { name: 'Napa Cabbage', price: 1.70 },
+            { name: 'Okra', price: 1.20 },
+            { name: 'Parsnip', price: 1.40 },
+            { name: 'Quinoa', price: 2.70 },
+            { name: 'Radish', price: 0.70 },
+            { name: 'Spinach', price: 1.50 },
+            { name: 'Tomato', price: 1.00 },
+            { name: 'Urad Dal', price: 2.50 },
+            { name: 'Vidalia Onion', price: 1.20 },
+            { name: 'Watercress', price: 1.90 },
+            { name: 'Yam', price: 1.00 },
+            { name: 'Zucchini Blossom', price: 2.80 }
+        ];
+
+        const itemList = document.getElementById('item-list');
+        const cart = document.getElementById('cart');
+        const totalElement = document.getElementById('total');
+        let total = 0;
+
+        function displayItems(filteredItems = items) {
+            itemList.innerHTML = '';
+            filteredItems.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${item.name}</td>
+                    <td><input type="number" id="${item.name}-quantity" min="1" value="1"></td>
+                    <td>$${item.price.toFixed(2)}</td>
+                    <td><button class="add-to-cart" onclick="addToCart('${item.name}', ${item.price})">Add to Cart</button></td>
+                `;
+                itemList.appendChild(tr);
+            });
+        }
+
+        function addToCart(name, price) {
+            const quantity = document.getElementById(`${name}-quantity`).value;
+            const li = document.createElement('li');
+            li.textContent = `${name} - $${price.toFixed(2)} x ${quantity} = $${(price * quantity).toFixed(2)}`;
+            cart.appendChild(li);
+            total += price * quantity;
+            totalElement.textContent = total.toFixed(2);
+        }
+
+        document.getElementById('search').addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            const filteredItems = items.filter(item => item.name.toLowerCase().includes(query));
+            displayItems(filteredItems);
+        });
+
+        function checkout() {
+            const cartItems = [];
+            Array.from(cart.children).forEach(cartItem => {
+                const itemText = cartItem.textContent.trim();
+                const itemName = itemText.split(' - ')[0];
+                const itemPrice = parseFloat(itemText.split('$')[1].split(' x ')[0]);
+                const itemQuantity = parseInt(itemText.split(' x ')[1].split(' = ')[0]);
+                
+                cartItems.push({
+                    name: itemName,
+                    price: itemPrice,
+                    quantity: itemQuantity
+                });
+            });
+
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ cartItems }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert(`Total: $${total.toFixed(2)}\nThank you for your purchase!`);
+                cart.innerHTML = '';
+                total = 0;
+                totalElement.textContent = total.toFixed(2);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('There was an error processing your request.');
+            });
+        }
+
+        displayItems();
+    </script>
+</body>
+</html>
